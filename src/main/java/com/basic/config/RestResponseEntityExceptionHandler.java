@@ -1,5 +1,6 @@
 package com.basic.config;
 
+import com.basic.dto.output.GenericResponse;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
@@ -38,18 +39,26 @@ public class RestResponseEntityExceptionHandler
         logger.error("An error occurred when processing the request", ex);
 
         String bodyOfResponse = "Object was not found";
-        return handleExceptionInternal(ex, bodyOfResponse,
+        var response = new GenericResponse.Builder().
+                success(false)
+                .message(bodyOfResponse)
+                .build();
+        return handleExceptionInternal(ex, response,
                 new HttpHeaders(), HttpStatus.NOT_FOUND, request);
     }
 
     @ExceptionHandler(value
-            = { RuntimeException.class })
+            = { RuntimeException.class, Exception.class })
     protected ResponseEntity<Object> handleGenericError(
             RuntimeException ex, WebRequest request) {
         logger.error("An error occurred when processing the request", ex);
 
         String bodyOfResponse = "This request couldn't be processed";
-        return handleExceptionInternal(ex, bodyOfResponse,
+        var response = new GenericResponse.Builder().
+                success(false)
+                .message(bodyOfResponse)
+                .build();
+        return handleExceptionInternal(ex, response,
                 new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
 
@@ -60,14 +69,20 @@ public class RestResponseEntityExceptionHandler
             ConstraintViolationException ex, WebRequest request) {
         logger.error("An error occurred when processing the request", ex);
 
-        String bodyOfResponse = "This request couldn't be processed";
+        String bodyOfResponse = "This request couldn't be processed due to validation errors";
+        var errors = ex.getConstraintViolations()
+                .stream()
+                .map(ConstraintViolation::getMessage)
+                .collect(Collectors.toList());
 
-        return handleExceptionInternal(ex,
-                ex.getConstraintViolations()
-                        .stream()
-                        .map(ConstraintViolation::getMessage)
-                        .collect(Collectors.joining()),
-                new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
+        var response = new GenericResponse.Builder().
+                success(false)
+                .message(bodyOfResponse)
+                .data(errors)
+                .build();
+
+        return handleExceptionInternal(ex, response,
+                new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 
 }

@@ -1,6 +1,7 @@
 package com.basic.controller;
 
 import com.basic.dto.input.ProductInputDto;
+import com.basic.dto.output.GenericResponse;
 import com.basic.dto.output.ProductDto;
 import com.basic.service.ProductService;
 import jakarta.validation.Valid;
@@ -30,30 +31,41 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductDto> findById(@PathVariable String id) {
-        return ResponseEntity.ok(service.getProductById(id));
+    public ResponseEntity<GenericResponse> findById(@PathVariable String id) {
+        return ResponseEntity.ok(
+                new GenericResponse.Builder()
+                        .data(service.getProductById(id))
+                        .success(true)
+                        .build());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProductDto> updateObject(@PathVariable String id, @RequestBody ProductInputDto input)
+    public ResponseEntity<GenericResponse> updateObject(@PathVariable String id, @RequestBody ProductInputDto input)
     {
-        return ResponseEntity.ok(service.update(id, input));
-    }
-
-    @PatchMapping("/{id}")
-    public String partialUpdate(@PathVariable String id) {
-        return "updated";
+        return ResponseEntity.ok(
+                new GenericResponse.Builder()
+                        .data(service.update(id, input))
+                        .success(true)
+                        .build());
     }
 
     @PostMapping
-    public ResponseEntity<ProductDto> create(@RequestBody @Valid ProductInputDto input) {
+    public ResponseEntity<GenericResponse> create(@RequestBody ProductInputDto input) {
         logger.info("Creating object: {}", input);
-        return ResponseEntity.ok(service.create(input));
+        return ResponseEntity.ok(
+                new GenericResponse.Builder()
+                        .data(service.create(input))
+                        .success(true)
+                        .build());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteObject(@PathVariable String id) {
+    public ResponseEntity<GenericResponse> deleteObject(@PathVariable String id) {
         service.delete(id);
-        return ResponseEntity.ok("Object was removed");
+        return ResponseEntity.ok(
+                new GenericResponse.Builder()
+                        .message("Object was removed")
+                        .success(true)
+                        .build());
     }
 }
