@@ -78,7 +78,7 @@ public class ProductService {
 
     }
 
-    public ProductDto update(@Valid @ValidUUID(message = "Not a valid UUID") String id,
+    public ProductDto update(@Valid @ValidUUID String id,
                              @Valid ProductInputDto input) {
 
         logger.info("Updating product id = {}", id);

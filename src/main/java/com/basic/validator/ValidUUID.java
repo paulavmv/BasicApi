@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
 @ReportAsSingleViolation
 @Pattern(message = "Invalid UUID", regexp="^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$")
 public @interface ValidUUID {
-    String message() default "{invalid.uuid}";
+    String message() default "Invalid UUID";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }
