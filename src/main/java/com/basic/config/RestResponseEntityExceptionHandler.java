@@ -28,7 +28,11 @@ public class RestResponseEntityExceptionHandler
             RuntimeException ex, WebRequest request) {
         logger.error("An error occurred when processing the request", ex);
         String bodyOfResponse = "A problem occurred when handling the request";
-        return handleExceptionInternal(ex, bodyOfResponse,
+        var response = new GenericResponse.Builder().
+                success(false)
+                .message(bodyOfResponse)
+                .build();
+        return handleExceptionInternal(ex, response,
                 new HttpHeaders(), HttpStatus.CONFLICT, request);
     }
 
